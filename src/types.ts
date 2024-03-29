@@ -8,6 +8,8 @@ export interface Property {
   isRelation?: boolean;
   enumValues?: Array<String>;
   default?: String | boolean | Array<String> | null | number | Array<number>;
+  prismaOptions?: String;
+  prismaType?: String;
 }
 export interface Model {
   name: String;
@@ -20,12 +22,15 @@ export type DefinitionsPropertyType = {
     type: string;
     $ref: string;
     default: any;
+    prismaOptions?: String;
+    prismaType?: string;
     anyOf: Array<AnyOfType>;
     enum: Array<string>;
     format: string;
     items: {
       $ref: string;
       type?: string;
+      prismaType?: string;
     };
   };
 };

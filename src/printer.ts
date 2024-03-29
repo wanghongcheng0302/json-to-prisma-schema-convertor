@@ -60,13 +60,14 @@ export class Printer {
 
   printModel(model: Model): string {
     const stringModelLines: Array<String> = model.properties.map((property) => {
+      const propertyOptions = property.prismaOptions || ''
+      
       return `${property.name}\t ${getModelPropertyType(property, model)} ${
         property.default !== null && property.default !== undefined
           ? `@default(${property.default})`
           : ''
-      }`;
+      } ${propertyOptions}`;
     });
-
     return `model ${model.name} {${EOL}${stringModelLines.join(
       EOL,
     )}${EOL}}${EOL}`;

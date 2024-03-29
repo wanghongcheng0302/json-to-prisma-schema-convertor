@@ -56,6 +56,7 @@ export class Transformer {
       let enumValues: Array<string> = [];
       let defaultValue = propValue?.default;
       let isRelation = false;
+
       let isList = false;
       if (propValue?.type === 'string' && propValue?.format === 'date-time') {
         fieldType = 'DateTime';
@@ -66,6 +67,9 @@ export class Transformer {
       ) {
         isRequired = false;
       }
+
+      let prismaOptions = propValue.prismaOptions
+      let prismaType = propValue.prismaType
 
       if (
         propValue?.anyOf &&
@@ -95,7 +99,7 @@ export class Transformer {
       if (propValue?.type === 'array') {
         isList = true;
         if (propValue?.items?.type) {
-          fieldType = propValue?.items?.type;
+          fieldType = propValue?.items.prismaType || propValue?.items?.type;
         }
 
         if (propValue?.items?.['$ref']) {
@@ -113,14 +117,15 @@ export class Transformer {
         fieldType = propValue?.type;
       }
 
-      properties.push({
-        name: this.transformPropertyName(propName),
-        type: fieldType,
+      let property = {
+        name: propName,
+        type: prismaType || fieldType,
         ...(Array.isArray(fieldType) &&
           fieldType?.length === 2 && {
             type: fieldType.find((type) => type !== 'null'),
           }),
         isRequired,
+        prismaOptions,
         ...(Array.isArray(fieldType) &&
           fieldType?.length === 6 &&
           fieldType.every((type) =>
@@ -139,7 +144,9 @@ export class Transformer {
           }),
         isList,
         isRelation,
-      });
+      }
+
+      properties.push(property);
     }
     this.models.push({
       name: modelName,
